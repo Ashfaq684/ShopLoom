@@ -1,13 +1,13 @@
-from django.contrib import admin
-from . models import Product
+# from django.contrib import admin
+# from . models import Product
 
-# Register your models here.
+# # Register your models here.
 
-# admin.site.register(Product)
+# # admin.site.register(Product)
 
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ['product_name', 'price', 'category', 'stock', 'created_date', 'modified_date', 'is_available']
+# class ProductAdmin(admin.ModelAdmin):
+#     list_display = ['product_name', 'price', 'category', 'stock', 'created_date', 'modified_date', 'is_available']
     
-    prepopulated_fields = {'slug' : ('product_name',)}
+#     prepopulated_fields = {'slug' : ('product_name',)}
     
-admin.site.register(Product, ProductAdmin)
+# admin.site.register(Product, ProductAdmin)
