@@ -3,6 +3,9 @@ from accounts.models import Account
 from .forms import RegistrationForm
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
+from cart.models import Cart, CartItem
+from cart.views import _cart_id
+import requests
 
 # verification email
 from django.contrib.sites.shortcuts import get_current_site
@@ -59,20 +62,64 @@ def user_login(request):
         user = auth.authenticate(email=email, password=password)
         
         if user is not None:
+            try:
+                cart = Cart.objects.get(cart_id=_cart_id(request))
+                is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
+                if is_cart_item_exists:
+                    cart_item = CartItem.objects.filter(cart=cart)
+
+                    product_variation = []
+                    for item in cart_item:
+                        variation = item.variations.all()
+                        product_variation.append(list(variation))
+                    
+                    cart_item = CartItem.objects.filter(user=user)
+                    existing_variations_list = []
+                    id = []
+                    for item in cart_item:
+                        existing_variations = item.variations.all()
+                        existing_variations_list.append(list(existing_variations))
+                        id.append(item.id)
+                    
+                    for pr in product_variation:
+                        if pr in existing_variations_list:
+                            index = existing_variations_list.index(pr)
+                            item_id = id[index]
+                            item = CartItem.objects.get(id=item_id)
+                            item.quantity += 1
+                            item.user = user
+                            item.save()
+                        else:
+                            cart_item = CartItem.objects.filter(cart=cart)
+                            for item in cart_item:
+                                item.user = user
+                                item.save()
+            except:
+                pass
             auth.login(request, user)
             messages.success(request, 'You are now logged in.')
-            return redirect('dashboard')
+            url = request.META.get('HTTP_REFERER')
+            try:
+                query = requests.utils.urlparse(url).query
+                params = dict(x.split('=') for x in query.split('&'))
+                if 'next' in params:
+                    nextPage = params['next']
+                    return redirect(nextPage)
+            except:
+                return redirect('dashboard')
         else:
             messages.error(request, 'Invalid login credentials')
             return redirect('login')
 
     return render(request, 'accounts/signin.html')
 
+
 @login_required(login_url = 'login')
 def user_logout(request):
     auth.logout(request)
     messages.success(request, 'You are logged out.')
     return redirect('login')
+
 
 def activate(request ,uidb64, token):
     try:
@@ -90,9 +137,11 @@ def activate(request ,uidb64, token):
         messages.error(request, 'Invalid activation link')
         return redirect('register')
 
+
 @login_required(login_url = 'login')
 def dashboard(request):
     return render(request, 'accounts/dashboard.html')
+
 
 def forgotPassword(request):
     if request.method == 'POST':
@@ -155,3 +204,5 @@ def resetPassword(request):
             return redirect('resetPassword')
     else:
         return render(request, 'accounts/resetPassword.html')
+
+
