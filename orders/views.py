@@ -3,6 +3,7 @@ from cart.models import CartItem
 from .forms import OrderForm
 from .models import Order
 import datetime
+from .ssl import sslcommerz_payment_gateway
 
 # Create your views here.
 
@@ -65,4 +66,4 @@ def place_order(request, total=0, quantity=0):
         return redirect('checkout')
 
 def payments(request):
-    return render(request, 'orders/payments.html')
+    return redirect(sslcommerz_payment_gateway)

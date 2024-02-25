@@ -1,10 +1,11 @@
-from django.shortcuts import redirect, render
-from accounts.models import Account
-from .forms import RegistrationForm
+from django.shortcuts import redirect, render, get_object_or_404
+from .models import Account, UserProfile
+from .forms import RegistrationForm, UserForm, UserProfileForm
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 from cart.models import Cart, CartItem
 from cart.views import _cart_id
+from orders.models import Order, OrderProduct
 import requests
 
 # verification email
