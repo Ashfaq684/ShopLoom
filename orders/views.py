@@ -7,6 +7,7 @@ from accounts.models import Account
 from cart.models import CartItem
 from store.models import Product
 from django.contrib import messages, auth
+from django.contrib.auth import login
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
@@ -18,29 +19,27 @@ import datetime
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CheckoutSuccessView(View):
-    model = Payment
-    template_name = 'orders/success.html'
-    
     def post(self, request, *args, **kwargs):
-        data = self.request.POST
-        try:
-            user_id = int(data['value_a'])
+        try: 
+            user_id = int(request.POST.get('value_a'))
             user = Account.objects.get(pk=user_id)
-            order = Order.objects.get(user=user, is_ordered=False, order_number=data['value_b'])
+            order_number = request.POST.get('value_b')
+            order = Order.objects.get(user=user, is_ordered=False, order_number=order_number)
             payment = Payment(
                 user = user,
-                payment_id = data['tran_id'],
-                payment_method = data['card_type'],
+                payment_id = request.POST.get('tran_id'),
+                payment_method = request.POST.get('card_type'),
                 amount_paid = order.order_total,
-                status = data['status'],
+                status = request.POST.get('status'),
             )
             payment.save()
-            
+
             order.payment = payment
             order.is_ordered = True
             order.save()
-            
+            # Move the cart items to Order Product table
             cart_items = CartItem.objects.filter(user=user)
+
             for item in cart_items:
                 orderproduct = OrderProduct()
                 orderproduct.order_id = order.id
@@ -51,13 +50,11 @@ class CheckoutSuccessView(View):
                 orderproduct.product_price = item.product.price
                 orderproduct.ordered = True
                 orderproduct.save()
-                
+
                 cart_item = CartItem.objects.get(id=item.id)
                 product_variation = cart_item.variations.all()
-                orderproduct = OrderProduct.objects.get(id=orderproduct.id)
                 orderproduct.variations.set(product_variation)
-                orderproduct.save()
-                
+
                 # Reduce the quantity of the sold products
                 product = Product.objects.get(id=item.product_id)
                 product.stock -= item.quantity
@@ -67,32 +64,38 @@ class CheckoutSuccessView(View):
             CartItem.objects.filter(user=user).delete()
             auth.login(request, user)
             mail_subject = 'Thank you for your order!'
-            message = render_to_string('orders/order_recived_email.html', {
+            message = render_to_string('orders/order_recieved_email.html', {
                 'user': user,
                 'order': order,
             })
-            to_email = data['value_c']
+            to_email = request.POST.get('value_c')
             send_email = EmailMessage(mail_subject, message, to=[to_email])
             send_email.send()
-            
+
             url = reverse('order_complete') + f'?order_id={order.order_number}&transaction_id={payment.payment_id}'
-            
+
             return redirect(url)
-        except:
-            messages.success(request, 'Something Went Wrong')
-        
-        return render(request, 'orders/success.html')
+
+        except Exception as e:
+            messages.error(request, f'An error occurred: {str(e)}')
+            return redirect('failed_payment')
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class CheckoutFaildView(View):
-    template_name = 'failed.html'
+class CheckoutFailedView(View):
+    template_name = 'orders/failed.html'
+
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
-        return render(request, self.template_name)
-
+        # Check if there are form errors
+        if request.POST.get('form_errors'):
+            # If there are form errors, render the form with the errors
+            return render(request, self.template_name, {'form_errors': request.POST.get('form_errors')})
+        else:
+            # If the form was submitted successfully, display a success message
+            return render(request, self.template_name, {'success_message': 'The form was submitted successfully!'})
 
 
 def place_order(request, total=0, quantity=0):
@@ -141,7 +144,7 @@ def place_order(request, total=0, quantity=0):
                 'tax': tax,
                 'grand_total': grand_total
             }
-            return redirect(sslcommerz_payment_gateway(request,order_number, str(current_user.id), grand_total, form.instance.email))
+            return redirect(sslcommerz_payment_gateway(request, str(current_user.id), order_number, grand_total, form.instance.email))
     else:
         return render(request, 'orders/payments.html')
 

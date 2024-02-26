@@ -113,7 +113,7 @@ def user_login(request):
             messages.error(request, 'Invalid login credentials')
             return redirect('login')
 
-    return render(request, 'accounts/signin.html')
+    return render(request, 'accounts/login.html')
 
 
 @login_required(login_url = 'login')
@@ -243,17 +243,17 @@ def edit_profile(request):
             profile_form.save()
             messages.success(request, 'Your profile has been updated.')
             return redirect('edit_profile')
-        else:
-            user_form = UserForm(instance=request.user)
-            profile_form = UserProfileForm(instance=userprofile)
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = UserProfileForm(instance=userprofile)
         
-        context = {
-            'user_form': user_form,
-            'profile_form': profile_form,
-            'userprofile': userprofile,
-        }
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'userprofile': userprofile,
+    }
         
-        return render(request, 'accounts/edit_profile.html', context)
+    return render(request, 'accounts/edit_profile.html', context)
 
 
 @login_required(login_url='login')

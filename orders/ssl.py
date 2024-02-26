@@ -23,8 +23,8 @@ def sslcommerz_payment_gateway(request, id, number, grand_total, email):
     post_body['fail_url'] = 'http://127.0.0.1:8000/orders/payment/faild/'
     post_body['cancel_url'] = 'http://127.0.0.1:8000/'
     post_body['emi_option'] = 0
-    post_body['cus_email'] = 'request.user.email'  # Retrieve email from the current user session
-    post_body['cus_phone'] = 'request.user.phone'  # Retrieve phone from the current user session
+    post_body['cus_email'] = request.user.email  # Retrieve email from the current user session
+    post_body['cus_phone'] = request.user.phone_number  # Retrieve phone from the current user session
     post_body['cus_add1'] = 'request.user.address'  # Retrieve address from the current user session
     post_body['cus_city'] = 'request.user.city'  # Retrieve city from the current user session
     post_body['cus_country'] = 'Bangladesh'
@@ -41,6 +41,5 @@ def sslcommerz_payment_gateway(request, id, number, grand_total, email):
     post_body['value_c'] = email
 
     response = sslcommez.createSession(post_body)
-    print(response)
     # return JsonResponse(response)
     return 'https://sandbox.sslcommerz.com/gwprocess/v4/gw.php?Q=pay&SESSIONKEY=' + response["sessionkey"]

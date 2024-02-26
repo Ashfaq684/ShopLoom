@@ -126,13 +126,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR/'static',
+]
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-STATICFILES_DIRS = [
-    BASE_DIR/'static',
-]
 
 from django.contrib.messages import constants as messages
 
@@ -143,13 +143,17 @@ MESSAGE_TAGS = {
 SITE_ID = 1
 
 # SMTP configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = 'mostahid1999@gmail.com'
+EMAIL_HOST_PASSWORD = 'nrhs peah esty esgn'
 EMAIL_USE_TLS = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SSLCOMMERZ_PAYMENT_URL = 'https://sandbox.sslcommerz.com/gwprocess/v4/api.php'  # Update with production URL for live environment
+# SSLCOMMERZ_STORE_ID = 'djang64a00838ddbc2'
+# SSLCOMMERZ_STORE_PASSWORD = 'RUf4qUafVnvcRNN'
