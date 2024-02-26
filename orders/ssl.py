@@ -8,7 +8,7 @@ def unique_transaction_id_generator(size=10, chars=string.ascii_uppercase + stri
     return ''.join(random.choice(chars) for _ in range(size))
 
 @login_required 
-def sslcommerz_payment_gateway(request, id, user_id, grand_total):
+def sslcommerz_payment_gateway(request, id, number, grand_total, email):
     gateway_auth_details = PaymentGateWaySettings.objects.all().first()
     
     settings = {'store_id': gateway_auth_details.store_id,
@@ -37,8 +37,8 @@ def sslcommerz_payment_gateway(request, id, user_id, grand_total):
 
     # OPTIONAL PARAMETERS
     post_body['value_a'] = id
-    post_body['value_b'] = user_id
-    post_body['value_c'] = 'email'
+    post_body['value_b'] = number
+    post_body['value_c'] = email
 
     response = sslcommez.createSession(post_body)
     print(response)

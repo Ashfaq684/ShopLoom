@@ -23,7 +23,7 @@
         <div class="card">
           <h5 class="card-header">Payment Method</h5>
           <div class="card-body">
-            <p class="card-text">PayPal</p>
+            <p class="card-text">Online</p>
           </div>
         </div>
         <div class="card">
@@ -97,11 +97,17 @@
             </dl>
             <hr />
             <p class="text-center mb-3">
-              <img src="{% static "./images/misc/payments.png" %}" height="26" />
+              <img style="width:300px;height:auto;" src="https://securepay.sslcommerz.com/public/image/SSLCommerz-Pay-With-logo-All-Size-05.png" />
             </p>
             <a href="{% url "checkout" %}" class="btn btn-primary btn-block">
               Make payment
             </a>
+            <button class="your-button-class" id="sslczPayBtn"
+		                token="if you have any token validation"
+		                postdata="your javascript arrays or objects which requires in backend"
+		                order="If you already have the transaction generated for current order"
+		                endpoint="An URL where backend code will initiate the payment to SSLCOMMERZ"> Pay Now
+            </button>
           </div>
           <!-- card-body.// -->
         </div>
@@ -114,4 +120,17 @@
   </div>
   <!-- container .//  -->
 </section>
+
+<script>
+  (function (window, document) {
+    var loader = function () {
+      var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+      script.src = "https://seamless-epay.sslcommerz.com/embed.min.js?" + Math.random().toString(36).substring(7);
+      tag.parentNode.insertBefore(script, tag);
+    };
+  
+    window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+  })(window, document);
+  </script>
+
 {% endblock %}

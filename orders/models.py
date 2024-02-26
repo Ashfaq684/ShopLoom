@@ -3,6 +3,7 @@ from accounts.models import Account
 from store.models import Product, Variation
 
 # Create your models here.
+
 class Payment(models.Model):
     user           = models.ForeignKey(Account, on_delete=models.CASCADE)
     payment_id     = models.CharField(max_length= 100)
@@ -13,6 +14,7 @@ class Payment(models.Model):
     
     def __str__(self):
         return self.payment_id
+
 
 class Order(models.Model):
     STATUS = (
@@ -47,6 +49,7 @@ class Order(models.Model):
     
     def full_address(self):
         return f'{self.address_line_1} {self.address_line_2}'
+    
     def __str__(self):
         return self.first_name
 
@@ -56,9 +59,7 @@ class OrderProduct(models.Model):
     payment        = models.ForeignKey(Payment, on_delete= models.SET_NULL, blank=True, null=True)
     user           = models.ForeignKey(Account, on_delete= models.CASCADE)
     product        = models.ForeignKey(Product, on_delete= models.CASCADE)
-    variation      = models.ForeignKey(Variation, on_delete= models.CASCADE)
-    color          = models.CharField(max_length=50)
-    size           = models.CharField(max_length=50)
+    variations      = models.ForeignKey(Variation, on_delete= models.CASCADE)
     quantity       = models.IntegerField()
     product_price  = models.FloatField()
     ordered        = models.BooleanField(default=False)
@@ -68,6 +69,12 @@ class OrderProduct(models.Model):
     def __str__(self):
         return self.product.product_name
 
+
 class PaymentGateWaySettings(models.Model):
     store_id   = models.CharField(max_length=500, blank=True, null=True)
     store_pass = models.CharField(max_length=500, blank=True, null = True)
+    
+    class Meta:
+        verbose_name = "PaymentGatewaySetting"
+        verbose_name_plural = "PaymentGatewaySettings"
+        db_table = "paymentgatewaysettings"

@@ -23,6 +23,6 @@ class UserProfileAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" width="30" style="border-radius:50%;">'.format(object.profile_picture.url))
         return format_html('<img src="https://www.vecteezy.com/vector-art/2002403-man-with-beard-avatar-character-isolated-icon" width="30" style="border-radius:50%;">')
     thumbnail.short_description = 'Profile Picture'
-    list_display = ('thumbnail', 'user', 'city', 'state', 'country')
+    list_display = ('thumbnail', 'user', 'city', 'country')
 
 admin.site.register(UserProfile, UserProfileAdmin)

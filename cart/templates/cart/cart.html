@@ -1,9 +1,12 @@
 {% extends "base.html" %}
+
 {% load static %}
 {% block content %}
+
 <section class="section-content padding-y bg">
+  
   <div class="container">
-    <!-- ============================ COMPONENT 1 ================================= -->
+
     {% if not cart_items %}
       <h2 class="text-center">Your Shopping Cart is Empty</h2>
       <br>
@@ -121,9 +124,9 @@
       <!-- col.// -->
     </div>
     <!-- row.// -->
-    <!-- ============================ COMPONENT 1 END .// ================================= -->
     {% endif %}
   </div>
   <!-- container .//  -->
 </section>
+
 {% endblock %}
